@@ -31,3 +31,5 @@ _off_: Allways off (no fan)
 _min=value_: Change the value for the OFF_THRESHOLD
 _max=value_: Change the value for the ON_THRESHOLD
 _sleep=value_: Change sleep value, interval between temperature reading
+
+Note that the values only change for the active session, when you restart your PI all the configs back to the default values of the script.
