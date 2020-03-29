@@ -139,6 +139,8 @@ def get_temp():
 
 
 def main_loop():
+    print("To view this session again type 'screen -r pi-fan-controll'.")
+    print("To detach the session an let the script run in the background, press Ctrl+A and then Ctrl+D")
     idle_work()
 
 try:
