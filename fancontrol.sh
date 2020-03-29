@@ -12,11 +12,11 @@
 case "$1" in
   start)
     echo "Starting fancontrol.py"
-    /usr/local/bin/fancontrol.py &
+    screen -dmS pi-fan-controller /usr/local/bin/fancontrol.py
     ;;
   stop)
     echo "Stopping fancontrol.py"
-    pkill -f /usr/local/bin/fancontrol.py
+    screen -X -S pi-fan-controller
     ;;
   *)
     echo "Usage: /etc/init.d/fancontrol.sh {start|stop}"
