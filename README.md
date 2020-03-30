@@ -1,5 +1,3 @@
-# This fork is not tested yet, be careful!
-
 # Pi Fan Controller
 
 Raspberry Pi fan controller.
