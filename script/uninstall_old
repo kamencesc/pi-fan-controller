@@ -1,0 +1,14 @@
+#! /bin/sh
+
+set -e
+
+echo "=> Stoping old fan controller script...\n"
+sudo pkill -f /usr/local/bin/fancontrol.py
+
+echo "=> Uninstalling fan controller...\n"
+sudo rm /usr/local/bin/fancontrol.py
+
+sudo update-rc.d -f fancontrol.py remove
+
+echo "Fan controller uninstalled."
+
