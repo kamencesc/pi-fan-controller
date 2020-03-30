@@ -13,7 +13,7 @@ found on our guide: [Control Your Raspberry Pi Fan (and Temperature) with Python
 
 ## Terminal commands
 
-This scripts runs on a screen session (so, you need to install screen "sudo apt install screen"), this creates a sesion called "pi-fa-controller".
+This scripts runs on a screen session (so, you need to install screen "sudo apt install screen"), this creates a sesion called "fancontroller".
 
 To enter you need to use this to _redeem_ the session:
 
