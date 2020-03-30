@@ -33,10 +33,11 @@ OFF_THRESHOLD = 55  # (degress Celsius) Fan shuts off at this temperature.
 SLEEP_INTERVAL = 5  # (seconds) How often we check the core temperature.
 GPIO_PIN = 17  # Which GPIO pin you're using to control the fan.
 
+
 # New variables
 
 # Mode can be ON, OFF or AUTO
-MODE="AUTO"
+MODE = "AUTO"
 
 # select() should wait for this many seconds for input.
 # A smaller number means more cpu usage, but a greater one
@@ -44,6 +45,9 @@ MODE="AUTO"
 # available and the program starting to work on it.
 timeout = 0.1 # seconds
 last_work_time = time.time()
+read_list = [sys.stdin]
+
+fan = OutputDevice(GPIO_PIN)
 
 def treat_input(linein):
   global last_work_time
@@ -53,36 +57,40 @@ def treat_input(linein):
   global MODE
   #linein is the string to process
   if type(linein) == str:
-    linein = linein.lower
-	if linein == "start":
-		# Force fan to start
-		MODE = "ON"
-	elif linein == "stop":
-		# Force fan to stop
-		MODE = "OFF"
-	elif linein == "auto":
-		# Back to auto mode
-		MODE = "AUTO"
-	elif "=" in linein:
-		# Possible change config on the run
-		if "top" in linein:
-			# New value for ON_THRESHOLD
-			if OFF_THRESHOLD >= ON_THRESHOLD:
-				print("Value is lower than the off threshold value (" + str(OFF_THRESHOLD)+ ")")
-			else
-				ON_THRESHOLD = int(linein.split("=").strip())
-		print("On threshold value changed to " + str(ON_THRESHOLD))
-		elif "bottom" in linein:
-			# New value for OFF_THRESHOLD
-			if OFF_THRESHOLD >= ON_THRESHOLD:
-				print("Value is more greater than the on threshold value (" + str(OFF_THRESHOLD)+ ")")
-			else
-				OFF_THRESHOLD = int(linein.split("=").strip())
-			print(Off threshold value changed to " + str(OFF_THRESHOLD))
-		elif "sleep" in linein:
-			# New value for sleep
-			SLEEP_INTERVAL = int(linein.split("=").strip())
-			print("Sleep interval value changed to " + str(SLEEP_INTERVAL))
+    linein = linein.lower()
+    linein = linein.rstrip()
+    if linein == "start":
+      # Force fan to start
+      MODE = "ON"
+      print("Mode set to ON")
+    elif linein == "stop":
+      # Force fan to stop
+      MODE = "OFF"
+      print("Mode set to OFF")
+    elif linein == "auto":
+      # Back to auto mode
+      MODE = "AUTO"
+      print("Mode set to AUTO")
+    elif "=" in linein:
+      # Possible change config on the run
+      if "top" in linein:
+        # New value for ON_THRESHOLD
+        if OFF_THRESHOLD >= ON_THRESHOLD:
+          print("Value is lower than the off threshold value (" + str(OFF_THRESHOLD)+ ")")
+        else:
+          ON_THRESHOLD = int(linein.split("=").strip())
+          print("On threshold value changed to " + str(ON_THRESHOLD))
+    elif "bottom" in linein:
+      # New value for OFF_THRESHOLD
+      if OFF_THRESHOLD >= ON_THRESHOLD:
+        print("Value is more greater than the on threshold value (" + str(OFF_THRESHOLD)+ ")")
+      else:
+        OFF_THRESHOLD = int(linein.split("=").strip())
+        print("Off threshold value changed to " + str(OFF_THRESHOLD))
+    elif "sleep" in linein:
+      # New value for sleep
+      SLEEP_INTERVAL = int(linein.split("=").strip())
+      print("Sleep interval value changed to " + str(SLEEP_INTERVAL))
   last_work_time = time.time()
 
 def idle_work():
@@ -91,35 +99,35 @@ def idle_work():
   global OFF_THRESHOLD
   global SLEEP_INTERVAL
   global MODE
+  global fan
   now = time.time()
   # Do the main code from pi-fan-controller there
   if now - last_work_time > SLEEP_INTERVAL:
     # Validate the on and off thresholds
     if OFF_THRESHOLD >= ON_THRESHOLD:
-        raise RuntimeError('OFF_THRESHOLD must be less than ON_THRESHOLD')
-    fan = OutputDevice(GPIO_PIN)
+      raise RuntimeError('OFF_THRESHOLD must be less than ON_THRESHOLD')
+    # fan = OutputDevice(GPIO_PIN)
     temp = get_temp()
-	# Start the fan if the temperature has reached the limit and the fan
-	# isn't already running.
-	# NOTE: `fan.value` returns 1 for "on" and 0 for "off"
-	# Do whats MODE says
-	if MODE == "AUTO":
-		# pi-fan-controller MODE
-		if temp > ON_THRESHOLD and not fan.value:
-			fan.on()
-
-		# Stop the fan if the fan is running and the temperature has dropped
-		# to 10 degrees below the limit.
-		elif fan.value and temp < OFF_THRESHOLD:
-			fan.off()
-	elif MODE == "ON":
-		# Allways ON
-		if not fan.value:
-			fan.on()
-	elif MODE == "OFF":
-	# Allways OFF
-		if fan.value:
-			fan.off()
+    # Start the fan if the temperature has reached the limit and the fan
+    # isn't already running.
+    # NOTE: `fan.value` returns 1 for "on" and 0 for "off"
+    # Do whats MODE says
+    if MODE == "AUTO":
+      # pi-fan-controller MODE
+      if temp > ON_THRESHOLD and not fan.value:
+        fan.on()
+      # Stop the fan if the fan is running and the temperature has dropped
+      # to 10 degrees below the limit.
+      elif fan.value and temp < OFF_THRESHOLD:
+        fan.off()
+    elif MODE == "ON":
+      # Allways ON
+      if not fan.value:
+        fan.on()
+    elif MODE == "OFF":
+      # Allways OFF
+      if fan.value:
+        fan.off()
     last_work_time = now
 
 def get_temp():
@@ -139,10 +147,19 @@ def get_temp():
 
 
 def main_loop():
-    print("To view this session again type 'screen -r pi-fan-controll'.")
-    print("To detach the session an let the script run in the background, press Ctrl+A and then Ctrl+D")
-    idle_work()
-
+  print("To view this session again type 'screen -r pi-fan-controll'.")
+  print("To detach the session an let the script run in the background, press Ctrl+A and then Ctrl+D")
+  while read_list:
+    ready = select.select(read_list, [], [], timeout)[0]
+    if not ready:
+      idle_work()
+    else:
+      for file in ready:
+        line = file.readline()
+        if not line: # EOF, remove file from input list
+          read_list.remove(file)
+        elif line.rstrip(): # optional: skipping empty lines
+          treat_input(line)
 try:
     main_loop()
 except KeyboardInterrupt:
