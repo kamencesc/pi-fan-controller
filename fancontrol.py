@@ -59,11 +59,11 @@ def treat_input(linein):
   if type(linein) == str:
     linein = linein.lower()
     linein = linein.rstrip()
-    if linein == "start":
+    if linein == "on":
       # Force fan to start
       MODE = "ON"
       print("Mode set to ON")
-    elif linein == "stop":
+    elif linein == "off":
       # Force fan to stop
       MODE = "OFF"
       print("Mode set to OFF")
