@@ -17,7 +17,7 @@ This scripts runs on a screen session (so, you need to install screen "sudo apt 
 
 To enter you need to use this to _redeem_ the session:
 
-```screen -r pi-fan-controller```
+```screen -r fancontroller```
 
 And to _detach_ the session only press ctrl+a ctrol+d
 
