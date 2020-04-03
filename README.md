@@ -30,4 +30,10 @@ The commands availabe are:
 - _max=value_: Change the value for the ON_THRESHOLD
 - _sleep=value_: Change sleep value, interval between temperature reading
 
-Note that the values only change for the active session, when you restart your PI all the configs back to the default values of the script.
+Note that the values only change for the active session, when you restart your PI all the configs back to the default values of the script. The change will be applied each time that the script reads temperature.
+
+You can controll the fan via easy scripts with a line like this:
+
+```screen -S fancontroller -p 0 -X stuff "COMMAND^M"```
+
+Change COMMAND for any of the commands mentioned before
