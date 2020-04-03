@@ -23,7 +23,7 @@ And to _detach_ the session only press ctrl+a ctrol+d
 
 The commands availabe are:
 
-- _auto_: It change to standard mode.
+- _auto_: Change to standard mode.
 - _on_: Allways on
 - _off_: Allways off (no fan)
 - _min=value_: Change the value for the OFF_THRESHOLD
