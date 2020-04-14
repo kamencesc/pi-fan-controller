@@ -71,6 +71,10 @@ def treat_input(linein):
       # Back to auto mode
       MODE = "AUTO"
       print("Mode set to AUTO")
+    elif linein == "temp":
+      # Get temperature
+      temp = get_temp()
+      print("Temperature: " + str(temp))
     elif "=" in linein:
       # Possible change config on the run
       if "top" in linein:
@@ -145,10 +149,10 @@ def get_temp():
     except (IndexError, ValueError):
         raise RuntimeError('Could not parse temperature output.')
 
-
 def main_loop():
   print("To view this session again type 'screen -r pi-fan-controll'.")
-  print("To detach the session an let the script run in the background, press Ctrl+A and then Ctrl+D")
+  print("To detach the session an let the script run in the background, press Ctrl+A and then Ctrl+D.")
+  print("Ctrl+C will close the script.")
   while read_list:
     ready = select.select(read_list, [], [], timeout)[0]
     if not ready:
