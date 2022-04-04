@@ -49,6 +49,17 @@ read_list = [sys.stdin]
 
 fan = OutputDevice(GPIO_PIN)
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def treat_input(linein):
   global last_work_time
   global ON_THRESHOLD
@@ -62,39 +73,45 @@ def treat_input(linein):
     if linein == "on":
       # Force fan to start
       MODE = "ON"
-      print("Mode set to ON")
+      print(bcolors.WARNING + "Mode set to ON" + bcolors.ENDC)
     elif linein == "off":
       # Force fan to stop
       MODE = "OFF"
-      print("Mode set to OFF")
+      print(bcolors.WARNING + "Mode set to OFF" + bcolors.ENDC)
     elif linein == "auto":
       # Back to auto mode
       MODE = "AUTO"
-      print("Mode set to AUTO")
+      print(bcolors.WARNING + "Mode set to AUTO" + bcolors.ENDC)
     elif linein == "temp":
       # Get temperature
       temp = get_temp()
-      print("Temperature: " + str(temp))
+      print(bcolors.WARNING + "Temperature: " + str(temp) + bcolors.ENDC)
     elif "=" in linein:
       # Possible change config on the run
-      if "top" in linein:
+      if "max" in linein:
         # New value for ON_THRESHOLD
         if OFF_THRESHOLD >= ON_THRESHOLD:
-          print("Value is lower than the off threshold value (" + str(OFF_THRESHOLD)+ ")")
+          print(bcolors.WARNING + "Value is lower than the off threshold value (" + str(OFF_THRESHOLD)+ ")" + bcolors.ENDC)
         else:
-          ON_THRESHOLD = int(linein.split("=").strip())
-          print("On threshold value changed to " + str(ON_THRESHOLD))
-    elif "bottom" in linein:
+          ON_THRESHOLD = int(linein.split("=")[1].strip())
+          print(bcolors.WARNING + "On threshold value changed to " + str(ON_THRESHOLD) + bcolors.ENDC)
+    elif "min" in linein:
       # New value for OFF_THRESHOLD
       if OFF_THRESHOLD >= ON_THRESHOLD:
-        print("Value is more greater than the on threshold value (" + str(OFF_THRESHOLD)+ ")")
+        print(bcolors.WARNING + "Value is more greater than the on threshold value (" + str(OFF_THRESHOLD)+ ")" + bcolors.ENDC)
       else:
-        OFF_THRESHOLD = int(linein.split("=").strip())
-        print("Off threshold value changed to " + str(OFF_THRESHOLD))
+        OFF_THRESHOLD = int(linein.split("=")[1].strip())
+        print(bcolors.WARNING + "Off threshold value changed to " + str(OFF_THRESHOLD) + bcolors.ENDC)
     elif "sleep" in linein:
       # New value for sleep
-      SLEEP_INTERVAL = int(linein.split("=").strip())
-      print("Sleep interval value changed to " + str(SLEEP_INTERVAL))
+      SLEEP_INTERVAL = int(linein.split("=")[1].strip())
+      print(bcolors.WARNING + "Sleep interval value changed to " + str(SLEEP_INTERVAL) + bcolors.ENDC)
+    elif "help" in linein:
+      print("Commands: on (allways on)\n          off (allways off)\n          auto (auto mode, default)")
+      print("          max=º (upper threshold, default 65º)\n          min=º (lower threshold, default 55º)")
+      print("          sleep=t (time between temperature's check, default 0.1)\n          help (show this text)") 
+    else:
+      print(bcolors.FAIL + "Unknown command '" + linein + "', type HELP to list commands." + bcolors.ENDC)
   last_work_time = time.time()
 
 def idle_work():
@@ -153,6 +170,7 @@ def main_loop():
   print("To view this session again type 'screen -r pi-fan-controll'.")
   print("To detach the session an let the script run in the background, press Ctrl+A and then Ctrl+D.")
   print("Ctrl+C will close the script.")
+  print("Type 'help' to list commands.")
   while read_list:
     ready = select.select(read_list, [], [], timeout)[0]
     if not ready:
