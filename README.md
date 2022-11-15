@@ -17,7 +17,7 @@ This scripts runs on a screen session (so, you need to install screen "sudo apt 
 
 To enter you need to use this to _redeem_ the session:
 
-```screen -r fancontroller```
+```screen -r fancontrol```
 
 And to _detach_ the session only press ctrl+a ctrol+d
 
@@ -34,6 +34,6 @@ Note that the values only change for the active session, when you restart your P
 
 You can controll the fan via easy scripts with a line like this:
 
-```screen -S fancontroller -p 0 -X stuff "COMMAND^M"```
+```screen -S fancontrol -p 0 -X stuff "COMMAND^M"```
 
 Change COMMAND for any of the commands mentioned before
